@@ -3,7 +3,10 @@ import http from 'http'
 import cors from 'cors'
 import { Server, Socket } from 'socket.io'
 
-const port: number = 3000
+import * as dotenv from 'dotenv'
+dotenv.config()
+
+const port: number = parseInt(process.env.PORT)
 
 const map: number[][] = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
