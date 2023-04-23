@@ -2,21 +2,12 @@ import express from 'express'
 import http from 'http'
 import cors from 'cors'
 import { Server, Socket } from 'socket.io'
+import Maze from './maze'
 
 import * as dotenv from 'dotenv'
 dotenv.config()
 
 const port: number = parseInt(process.env.PORT)
-
-const map: number[][] = [
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-	[1, 1, 1, 1, 1, 1, 1, 0, 1, 1],
-	[1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-]
 
 class App {
 	private server: http.Server
@@ -24,6 +15,8 @@ class App {
 
 	private io: Server
 	private clients: any = {}
+
+    private map: Maze
 
 	constructor(port: number) {
 		this.port = port
@@ -37,9 +30,17 @@ class App {
 			})
 		)
 
+        // Maze setup
+        this.map = new Maze({
+            rows: 11,
+            cols: 11,
+            entrance: [0, 1],
+            exit: [10, 9],
+        })
+
 		// GET route for fetching the map
 		app.get('/map', (req, res) => {
-			res.send(JSON.stringify({ map }))
+			res.send(JSON.stringify({ map: this.map.getMatrix() }))
 		})
 
 		this.server = new http.Server(app)
