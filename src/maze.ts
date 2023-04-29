@@ -1,25 +1,37 @@
 export interface MazeOptions {
   rows: number;
   cols: number;
-  entrance: [number, number];
-  exit: [number, number];
+}
+
+interface Vector2 {
+  x: number,
+  y: number
 }
 
 export default class Maze {
   private rows: number;
   private cols: number;
-  private entrance: [number, number];
-  private exit: [number, number];
+  private entrance: Vector2;
+  private exit: Vector2;
   private matrix: number[][];
+  private walkablePositions: Vector2[];
 
-  constructor({ rows, cols, entrance, exit }: MazeOptions) {
-    this.rows = rows - 2; // dirty fix for adding upper and lower walls
+  constructor({ rows, cols }: MazeOptions) {
+    this.rows = rows;
     this.cols = cols;
-    this.entrance = entrance;
-    this.exit = exit;
+    this.entrance = {x: 1, y: 1};
     this.matrix = Array.from({ length: this.rows }, () => Array.from({ length: this.cols }, () => 1));
 
     this.generate();
+
+    this.walkablePositions = this.matrix.reduce((acc, currentValue, index) => {
+		let walkablePositionsInRow: Vector2[] = [];
+        for (let i = 0; i < currentValue.length; i++) {
+			if (currentValue[i] == 0) walkablePositionsInRow.push({x: i, y: -index});
+        }
+        return [...acc, ...walkablePositionsInRow];
+	}, [] as Vector2[]);
+    this.exit = this.getRandomExit();
   }
 
   public getMatrix(): number[][] {
@@ -27,7 +39,7 @@ export default class Maze {
   }
 
   private generate(): void {
-    const stack: [number, number][] = [this.entrance];
+    const stack: [number, number][] = [[this.entrance.x, this.entrance.y]];
 
     while (stack.length > 0) {
       const current = stack.pop()!;
@@ -42,10 +54,6 @@ export default class Maze {
         stack.push([neighborRow, neighborCol]);
       }
     }
-
-    const emptyRow = Array.from({length: this.cols}, () => 1)
-    this.matrix = [emptyRow, ...this.matrix, emptyRow]
-    this.rows += 2
   }
 
   private getUnvisitedNeighbors(row: number, col: number): [number, number][] {
@@ -75,5 +83,21 @@ export default class Maze {
     const wallCol = (col1 + col2) / 2;
 
     this.matrix[wallRow][wallCol] = 0;
+  }
+
+  public getWalkablePositions(): Vector2[] {
+    return this.walkablePositions;
+  }
+
+  public getRandomWalkablePosition(): Vector2 {
+    return this.walkablePositions[Math.floor(Math.random() * this.walkablePositions.length)];
+  }
+
+  private getRandomExit(): Vector2 {
+    return this.getRandomWalkablePosition();
+  }
+
+  public getExit(): Vector2 {
+    return this.exit;
   }
 }

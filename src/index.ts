@@ -30,17 +30,24 @@ class App {
 			})
 		)
 
+        const rows = 11
+        const cols = 11
+
         // Maze setup
         this.map = new Maze({
-            rows: 11,
-            cols: 11,
-            entrance: [0, 1],
-            exit: [10, 9],
+            rows,
+            cols
         })
 
 		// GET route for fetching the map
 		app.get('/map', (req, res) => {
-			res.send(JSON.stringify({ map: this.map.getMatrix() }))
+			res.send(JSON.stringify({
+                map: this.map.getMatrix(),
+                walkablePositions: this.map.getWalkablePositions(),
+                exit: this.map.getExit(),
+                width: cols,
+                height: rows
+            }))
 		})
 
 		this.server = new http.Server(app)
