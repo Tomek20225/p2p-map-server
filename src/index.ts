@@ -9,13 +9,30 @@ dotenv.config()
 
 const port: number = parseInt(process.env.PORT)
 
+type Clients = {
+    [id: string]: Client
+}
+
+type Scoreboard = {
+    [id: string]: number
+}
+
+type Client = {
+    t: number,
+    p: {
+        x: number,
+        y: number,
+        z: number
+    }
+}
+
 class App {
 	private server: http.Server
 	private port: number
 
 	private io: Server
-	private clients: any = {}
-    private scoreboard: any = {}
+	private clients: Clients = {}
+    private scoreboard: Scoreboard = {}
 
     private map: Maze
 
@@ -53,7 +70,7 @@ class App {
 			console.log(this.clients)
 			console.log('a user connected : ' + socket.id)
 
-			this.clients[socket.id] = {}
+            this.clients[socket.id] = {} as Client
 			this.scoreboard[socket.id] = 0
 
             socket.emit('map', this.getParsedMapObject())
