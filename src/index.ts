@@ -61,12 +61,13 @@ class App {
 
             socket.on('disconnect', () => {
 				console.log('socket disconnected : ' + socket.id)
-				if (this.clients && this.clients[socket.id] && this.scoreboard && this.scoreboard[socket.id]) {
-					console.log('deleting ' + socket.id)
-					delete this.clients[socket.id]
-					delete this.scoreboard[socket.id]
-					this.io.emit('removeClient', socket.id)
-				}
+				console.log('deleting ' + socket.id)
+
+                delete this.clients[socket.id]
+				delete this.scoreboard[socket.id]
+
+                this.io.emit('removeClient', socket.id)
+                this.io.emit('scoreboard', this.scoreboard)
 			})
 
 			socket.on('update', (message: any) => {
@@ -75,6 +76,8 @@ class App {
 					this.clients[socket.id].p = message.p // position
 				}
 			})
+
+            this.io.emit('scoreboard', this.scoreboard)
 		})
 
         // Updating positions of players
@@ -92,35 +95,30 @@ class App {
                 const clientX = Math.round(this.clients[clientId].p.x)
                 const clientY = Math.round(this.clients[clientId].p.y)
 
-                if (clientX == exitPos.x && clientY == exitPos.y) {
-                    this.io.emit('winner', clientId)
-                    console.log(`winner ${clientId}`)
+                if (!(clientX == exitPos.x && clientY == exitPos.y)) continue
 
-                    this.scoreboard[clientId]++
+                this.io.emit('winner', clientId)
+                console.log(`winner ${clientId}`)
 
-                    const clientAmount = Object.keys(this.clients).length
-                    let scaledRows = clientAmount * scaleFactor + Math.round((Math.random() * 4))
-                    let scaledCols = clientAmount * scaleFactor + Math.round((Math.random() * 4))
+                this.scoreboard[clientId]++
 
-                    scaledRows = scaledRows % 2 == 0 ? scaledRows + 1 : scaledRows
-                    scaledCols = scaledCols % 2 == 0 ? scaledCols + 1 : scaledCols
+                const clientAmount = Object.keys(this.clients).length
+                let scaledRows = clientAmount * scaleFactor + Math.round((Math.random() * 4))
+                let scaledCols = clientAmount * scaleFactor + Math.round((Math.random() * 4))
+                scaledRows = scaledRows % 2 == 0 ? scaledRows + 1 : scaledRows
+                scaledCols = scaledCols % 2 == 0 ? scaledCols + 1 : scaledCols
 
-                    this.map = new Maze({
-                        rows: scaledRows > defaultRows ? scaledRows : defaultRows,
-                        cols: scaledCols > defaultCols ? scaledCols : defaultCols
-                    })
+                this.map = new Maze({
+                    rows: scaledRows > defaultRows ? scaledRows : defaultRows,
+                    cols: scaledCols > defaultCols ? scaledCols : defaultCols
+                })
 
-                    this.io.emit('map', this.getParsedMapObject())
-                    this.io.emit('scoreboard', this.scoreboard)
+                this.io.emit('map', this.getParsedMapObject())
+                this.io.emit('scoreboard', this.scoreboard)
 
-                    break
-                }
+                break
             }
         }, 100)
-
-        setInterval(() => {
-            this.io.emit('scoreboard', this.scoreboard)
-        }, 1000)
     }
 
 	public Start() {
