@@ -30,13 +30,14 @@ class App {
 			})
 		)
 
-        const rows = 11
-        const cols = 11
+        const defaultRows = 11
+        const defaultCols = 11
+        const scaleFactor = 3
 
         // Maze setup
         this.map = new Maze({
-            rows,
-            cols
+            rows: defaultRows,
+            cols: defaultCols
         })
 
 		this.server = new http.Server(app)
@@ -97,9 +98,16 @@ class App {
 
                     this.scoreboard[clientId]++
 
+                    const clientAmount = Object.keys(this.clients).length
+                    let scaledRows = clientAmount * scaleFactor + Math.round((Math.random() * 4))
+                    let scaledCols = clientAmount * scaleFactor + Math.round((Math.random() * 4))
+
+                    scaledRows = scaledRows % 2 == 0 ? scaledRows + 1 : scaledRows
+                    scaledCols = scaledCols % 2 == 0 ? scaledCols + 1 : scaledCols
+
                     this.map = new Maze({
-                        rows,
-                        cols
+                        rows: scaledRows > defaultRows ? scaledRows : defaultRows,
+                        cols: scaledCols > defaultCols ? scaledCols : defaultCols
                     })
 
                     this.io.emit('map', this.getParsedMapObject())
