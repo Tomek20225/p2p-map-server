@@ -100,4 +100,8 @@ export default class Maze {
   public getExit(): Vector2 {
     return this.exit;
   }
+
+  public getEntrance(): Vector2 {
+    return {x: this.entrance.x, y: -this.entrance.y};
+  }
 }

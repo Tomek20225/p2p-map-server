@@ -44,6 +44,7 @@ class App {
 			res.send(JSON.stringify({
                 map: this.map.getMatrix(),
                 walkablePositions: this.map.getWalkablePositions(),
+                entrance: this.map.getEntrance(),
                 exit: this.map.getExit(),
                 width: cols,
                 height: rows
