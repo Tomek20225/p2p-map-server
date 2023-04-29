@@ -13,11 +13,11 @@ export default class Maze {
   private matrix: number[][];
 
   constructor({ rows, cols, entrance, exit }: MazeOptions) {
-    this.rows = rows;
+    this.rows = rows - 2; // dirty fix for adding upper and lower walls
     this.cols = cols;
     this.entrance = entrance;
     this.exit = exit;
-    this.matrix = Array.from({ length: rows }, () => Array.from({ length: cols }, () => 1));
+    this.matrix = Array.from({ length: this.rows }, () => Array.from({ length: this.cols }, () => 1));
 
     this.generate();
   }
@@ -43,7 +43,7 @@ export default class Maze {
       }
     }
 
-    const emptyRow = Array.from({length: this.rows}, () => 1)
+    const emptyRow = Array.from({length: this.cols}, () => 1)
     this.matrix = [emptyRow, ...this.matrix, emptyRow]
     this.rows += 2
   }
