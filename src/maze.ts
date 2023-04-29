@@ -94,7 +94,15 @@ export default class Maze {
   }
 
   private getRandomExit(): Vector2 {
-    return this.getRandomWalkablePosition();
+    let properPos = false
+    let randomPos: Vector2
+
+    while (!properPos) {
+        randomPos = this.getRandomWalkablePosition()
+        properPos = (randomPos.x != this.entrance.x && randomPos.y != this.entrance.y)
+    }
+
+    return randomPos
   }
 
   public getExit(): Vector2 {
@@ -103,5 +111,13 @@ export default class Maze {
 
   public getEntrance(): Vector2 {
     return {x: this.entrance.x, y: -this.entrance.y};
+  }
+
+  public getWidth(): number {
+    return this.cols
+  }
+
+  public getHeight(): number {
+    return this.rows
   }
 }
