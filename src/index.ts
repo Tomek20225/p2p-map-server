@@ -21,7 +21,6 @@ class App {
 	constructor(port: number) {
 		this.port = port
 		const app = express()
-		// app.use(express.static(path.join(__dirname, '../client')))
 
 		// CORS setup
 		app.use(
@@ -85,8 +84,23 @@ class App {
 
 		setInterval(() => {
 			this.io.emit('clients', this.clients)
-		}, 50)
-	}
+        }, 50)
+
+        const exitPos = this.map.getExit()
+        setInterval(() => {
+            for (const clientId of Object.keys(this.clients)) {
+                if (!this.clients[clientId].p) continue
+
+                const clientX = Math.round(this.clients[clientId].p.x)
+                const clientY = Math.round(this.clients[clientId].p.y)
+
+                if (clientX == exitPos.x && clientY == exitPos.y) {
+                    this.io.emit('winner', clientId)
+                    console.log(`winner ${clientId}`)
+                }
+            }
+        }, 100)
+    }
 
 	public Start() {
 		this.server.listen(this.port, () => {
