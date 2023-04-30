@@ -102,6 +102,11 @@ class App {
 			this.io.emit('clients', this.clients)
         }, 50)
 
+        // Updating scores of players
+		setInterval(() => {
+			this.io.emit('scoreboard', this.scoreboard)
+        }, 1000)
+
         // Checking for the winner
         setInterval(() => {
             const exitPos = this.map.getExit()
@@ -140,7 +145,7 @@ class App {
 
 	public Start() {
 		this.server.listen(this.port, () => {
-			console.log(`Server listening on port ${this.port}.`)
+			console.log(`Server listening on port ${this.port}`)
 		})
 	}
 
